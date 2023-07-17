@@ -1,0 +1,86 @@
+openapi: 3.0.0
+info:
+  title: KantSearch API
+  description: An API for the KantSearch backend.
+  version: 0.1.0
+servers:
+  - url: https://localhost:3000/api/v1
+paths:
+  /text/{id}:
+    get:
+      tags:
+        - Example
+      operationId: getText
+      summary: Get the text
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: "#/components/schemas/ID"
+          required: true
+          description: ID of text to get
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Text"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    BadRequest:
+      description: The server cannot or will not process the request due to an apparent client error (e.g., malformed request syntax, size too large, invalid request message framing, or deceptive request routing).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/HttpError"
+    NotFound:
+      description: The requested resource could not be found but may be available in the future.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/HttpError"
+    Conflict:
+      description: Indicates that the request could not be processed because of conflict in the current state of the resource, such as an edit conflict between multiple simultaneous updates.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/HttpError"
+    InternalServerError:
+      description: A generic error, given when an unexpected condition was encountered and no more specific message is suitable.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/HttpError"
+  schemas:
+    Text:
+      type: object
+      description: Some text
+      required:
+        - name
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        text:
+          type: string
+    ErrorCode:
+      type: integer
+      minimum: 100
+      maximum: 599
+    HttpError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+        message:
+          type: string
+    ID:
+      type: integer
+      minimum: 0
