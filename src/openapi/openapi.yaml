@@ -2,32 +2,22 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.1.0
+  version: 0.2.0
 servers:
   - url: https://localhost:3000/api/v1
 paths:
-  /text/{id}:
+  /debug:
     get:
       tags:
-        - Example
-      operationId: getText
-      summary: Get the text
-      parameters:
-        - in: path
-          name: id
-          schema:
-            $ref: "#/components/schemas/ID"
-          required: true
-          description: ID of text to get
+        - Debug
+      operationId: getDebugInfo
       responses:
         "200":
           description: OK
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: "#/components/schemas/Text"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                type: string
         "500":
           $ref: "#/components/responses/InternalServerError"
 components:
@@ -57,16 +47,6 @@ components:
           schema:
             $ref: "#/components/schemas/HttpError"
   schemas:
-    Text:
-      type: object
-      description: Some text
-      required:
-        - name
-      properties:
-        id:
-          $ref: "#/components/schemas/ID"
-        text:
-          type: string
     ErrorCode:
       type: integer
       minimum: 100
