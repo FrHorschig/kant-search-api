@@ -2,16 +2,16 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.4.1
+  version: 0.4.3
 servers:
   - url: https://localhost:3000/api/v1
 paths:
-  /work:
+  /works:
     post:
       tags:
-        - Upload
+        - Works
       operationId: postWork
-      summary: Post the text of a single work
+      summary: Post the text of work
       requestBody:
         description: The text to upload
         required: true
@@ -26,36 +26,28 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /work/{id}:
     get:
       tags:
-        - Read
-      operationId: getWork
-      summary: Get the text of a work
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            $ref: "#/components/schemas/ID"
-          description: ID of the work
+        - Works
+      operationId: getWorkMetadata
+      summary: Get the metadata of all works
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Work"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkMetadata"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /work/{id}/section:
+  /work/{id}/paragraphs:
     get:
       tags:
-        - Read
-      operationId: getWork
-      summary: Get the text of a work
+        - Paragraphs
+      operationId: getParagraphs
+      summary: Get paragraphs of a the text of a work
       parameters:
         - in: path
           name: id
@@ -75,7 +67,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Section"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Paragraph"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -127,15 +121,25 @@ components:
     PageRange:
       type: string
       pattern: '^(\d+|\d+-\d+)$'
-    Section:
+    Paragraph:
       type: object
       required:
+        - id
+        - text
+        - pages
         - workId
       properties:
-        workId:
+        id:
           $ref: "#/components/schemas/ID"
         text:
           type: string
+        pages:
+          type: array
+          items:
+            type: number
+            minimum: 1
+        workId:
+          $ref: "#/components/schemas/ID"
     Work:
       type: object
       required:
@@ -144,13 +148,28 @@ components:
         - text
         - volume
       properties:
-        id:
-          $ref: "#/components/schemas/ID"
         title:
           type: string
         abbreviation:
           type: string
         text:
+          type: string
+        volume:
+          type: integer
+          minimum: 1
+    WorkMetadata:
+      type: object
+      required:
+        - id
+        - title
+        - abbreviation
+        - volume
+      properties:
+        id:
+          $ref: "#/components/schemas/ID"
+        title:
+          type: string
+        abbreviation:
           type: string
         volume:
           type: integer
