@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.4.4
+  version: 0.4.6
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -147,6 +147,7 @@ components:
         - abbreviation
         - text
         - volume
+        - year
       properties:
         title:
           type: string
@@ -157,6 +158,8 @@ components:
         volume:
           type: integer
           minimum: 1
+        year:
+          $ref: "#/components/schemas/Year"
     WorkMetadata:
       type: object
       required:
@@ -164,6 +167,7 @@ components:
         - title
         - abbreviation
         - volume
+        - year
       properties:
         id:
           $ref: "#/components/schemas/ID"
@@ -174,3 +178,9 @@ components:
         volume:
           type: integer
           minimum: 1
+        year:
+          $ref: "#/components/schemas/Year"
+    Year:
+      type: integer
+      minimum: -999
+      maximum: 9999
