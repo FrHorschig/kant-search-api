@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.4.7
+  version: 0.5.0
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -74,6 +74,32 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /search:
+    post:
+      tags:
+        - Search
+      operationId: search
+      summary: Post the search criteria
+      requestBody:
+        description: The search criteria
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchCriteria"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 components:
   responses:
     BadRequest:
@@ -140,6 +166,24 @@ components:
             minimum: 1
         workId:
           $ref: "#/components/schemas/ID"
+    SearchCriteria:
+      type: object
+      required:
+        - searchWords
+      properties:
+        searchWords:
+          type: array
+          items:
+            type: string
+    SearchResult:
+      type: object
+      required:
+        - paragraphs
+      properties:
+        paragraphs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Paragraph"
     Work:
       type: object
       required:
