@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.7.4
+  version: 0.7.5
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -29,7 +29,7 @@ paths:
     get:
       tags:
         - Read
-      operationId: getWork
+      operationId: getWorks
       summary: Get the data of all works
       responses:
         "200":
