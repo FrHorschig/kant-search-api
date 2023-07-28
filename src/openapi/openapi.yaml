@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.5.5
+  version: 0.6.0
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -39,7 +39,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/WorkMetadata"
+                  $ref: "#/components/schemas/Work"
         "500":
           $ref: "#/components/responses/InternalServerError"
   /work/{id}/paragraphs:
@@ -93,7 +93,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ParagraphResults"
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
         "400":
           $ref: "#/components/responses/BadRequest"
         "500":
@@ -160,8 +162,7 @@ components:
         pages:
           type: array
           items:
-            type: integer
-            minimum: 1
+            $ref: "#/components/schemas/NaturalNumber"
         workId:
           $ref: "#/components/schemas/ID"
     SearchCriteria:
@@ -178,48 +179,24 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ID"
-    ParagraphResults:
+    SearchResult:
       type: object
-      required:
-        - paragraphs
-        - searchWords
       properties:
-        paragraphs:
+        volume:
+          $ref: "#/components/schemas/NaturalNumber"
+        matches:
           type: array
           items:
-            $ref: "#/components/schemas/Paragraph"
-        searchWords:
-          type: array
-          items:
-            type: string
+            $ref: "#/components/schemas/WorkMatch"
+    NaturalNumber:
+      type: integer
+      minimum: 1
     Work:
       type: object
       required:
         - title
-        - abbreviation
         - text
         - volume
-        - year
-      properties:
-        title:
-          type: string
-        abbreviation:
-          type: string
-        text:
-          type: string
-        volume:
-          type: integer
-          minimum: 1
-        year:
-          $ref: "#/components/schemas/Year"
-    WorkMetadata:
-      type: object
-      required:
-        - id
-        - title
-        - abbreviation
-        - volume
-        - year
       properties:
         id:
           $ref: "#/components/schemas/ID"
@@ -227,11 +204,24 @@ components:
           type: string
         abbreviation:
           type: string
+        text:
+          type: string
         volume:
-          type: integer
-          minimum: 1
+          $ref: "#/components/schemas/NaturalNumber"
+        ordinal:
+          description: The position of the work in the volume
+          $ref: "#/components/schemas/NaturalNumber"
         year:
           $ref: "#/components/schemas/Year"
+    WorkMatch:
+      type: object
+      properties:
+        work:
+          $ref: "#/components/schemas/Work"
+        matches:
+          type: array
+          items:
+            type: string
     Year:
       type: integer
       minimum: -999
