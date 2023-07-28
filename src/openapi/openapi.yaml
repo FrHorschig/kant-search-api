@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.6.0
+  version: 0.6.1
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -181,6 +181,9 @@ components:
             $ref: "#/components/schemas/ID"
     SearchResult:
       type: object
+      required:
+        - volume
+        - matches
       properties:
         volume:
           $ref: "#/components/schemas/NaturalNumber"
@@ -215,6 +218,9 @@ components:
           $ref: "#/components/schemas/Year"
     WorkMatch:
       type: object
+      required:
+        - work
+        - matches
       properties:
         work:
           $ref: "#/components/schemas/Work"
