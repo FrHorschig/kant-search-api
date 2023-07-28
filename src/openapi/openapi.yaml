@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.6.1
+  version: 0.7.0
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -18,7 +18,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Work"
+              $ref: "#/components/schemas/WorkUpload"
       responses:
         "201":
           description: Created
@@ -29,8 +29,8 @@ paths:
     get:
       tags:
         - Read
-      operationId: getWorkMetadata
-      summary: Get the metadata of all works
+      operationId: getWork
+      summary: Get the data of all works
       responses:
         "200":
           description: OK
@@ -144,6 +144,22 @@ components:
     ID:
       type: integer
       minimum: 0
+    Match:
+      type: object
+      required:
+        - work
+        - text
+      properties:
+        workTitle:
+          type: string
+        snippet:
+          type: string
+        pages:
+          type: array
+          items:
+            $ref: "#/components/schemas/NaturalNumber"
+        matchId:
+          description: The ID of the matched paragraph or sentence
     PageRange:
       type: string
       pattern: '^(\d+|\d+-\d+)$'
@@ -190,44 +206,45 @@ components:
         matches:
           type: array
           items:
-            $ref: "#/components/schemas/WorkMatch"
+            $ref: "#/components/schemas/Match"
     NaturalNumber:
       type: integer
       minimum: 1
     Work:
+      allOf:
+        - $ref: "#/components/schemas/WorkBase"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/ID"
+    WorkBase:
       type: object
       required:
         - title
-        - text
         - volume
       properties:
-        id:
-          $ref: "#/components/schemas/ID"
         title:
           type: string
         abbreviation:
           type: string
-        text:
-          type: string
         volume:
-          $ref: "#/components/schemas/NaturalNumber"
-        ordinal:
-          description: The position of the work in the volume
           $ref: "#/components/schemas/NaturalNumber"
         year:
           $ref: "#/components/schemas/Year"
-    WorkMatch:
-      type: object
-      required:
-        - work
-        - matches
-      properties:
-        work:
-          $ref: "#/components/schemas/Work"
-        matches:
-          type: array
-          items:
-            type: string
+    WorkUpload:
+      allOf:
+        - $ref: "#/components/schemas/WorkBase"
+        - type: object
+          required:
+            - text
+          properties:
+            text:
+              type: string
+            ordinal:
+              description: The position of the work in the volume
+              $ref: "#/components/schemas/NaturalNumber"
     Year:
       type: integer
       minimum: -999
