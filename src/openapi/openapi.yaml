@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.7.6
+  version: 0.7.7
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -70,6 +70,36 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Paragraph"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /work/{workId}/paragraphs/{paragraphId}:
+    get:
+      tags:
+        - Read
+      operationId: getParagraph
+      summary: Get a paragraph of a the text of a work by its ID
+      parameters:
+        - in: path
+          name: workId
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID"
+          description: ID of the work
+        - in: path
+          name: paragraphId
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID"
+          description: ID of the paragraph
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Paragraph"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -149,7 +179,8 @@ components:
       required:
         - snippet
         - pages
-        - matchId
+        - workId
+        - elementId
       properties:
         snippet:
           type: string
@@ -157,7 +188,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NaturalNumber"
-        matchId:
+        workId:
+          $ref: "#/components/schemas/ID"
+        elementId:
           description: The ID of the matched paragraph or sentence
           $ref: "#/components/schemas/ID"
     PageRange:
