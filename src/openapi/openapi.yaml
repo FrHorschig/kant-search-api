@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.7.8
+  version: 0.8.0
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -22,6 +22,12 @@ paths:
       responses:
         "201":
           description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkMetadata"
         "400":
           $ref: "#/components/responses/BadRequest"
         "500":
@@ -39,7 +45,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Work"
+                  $ref: "#/components/schemas/WorkMetadata"
         "500":
           $ref: "#/components/responses/InternalServerError"
   /works/{id}/paragraphs:
@@ -55,12 +61,6 @@ paths:
           schema:
             $ref: "#/components/schemas/ID"
           description: ID of the work
-        - in: query
-          name: pages
-          required: true
-          schema:
-            $ref: "#/components/schemas/PageRange"
-          description: The range of pages to get
       responses:
         "200":
           description: OK
@@ -85,7 +85,7 @@ paths:
           name: workId
           required: true
           schema:
-            $ref: "#/components/schemas/ID"
+            $ref: "#/components/schemas/WorkID"
           description: ID of the work
         - in: path
           name: paragraphId
@@ -179,7 +179,6 @@ components:
       required:
         - snippet
         - pages
-        - workId
         - elementId
       properties:
         snippet:
@@ -188,14 +187,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NaturalNumber"
-        workId:
-          $ref: "#/components/schemas/ID"
         elementId:
           description: The ID of the matched paragraph or sentence
           $ref: "#/components/schemas/ID"
-    PageRange:
-      type: string
-      pattern: '^(\d+|\d+-\d+)$'
     Paragraph:
       type: object
       required:
@@ -213,7 +207,7 @@ components:
           items:
             $ref: "#/components/schemas/NaturalNumber"
         workId:
-          $ref: "#/components/schemas/ID"
+          $ref: "#/components/schemas/WorkID"
     SearchCriteria:
       type: object
       required:
@@ -227,61 +221,59 @@ components:
         workIds:
           type: array
           items:
-            $ref: "#/components/schemas/ID"
+            $ref: "#/components/schemas/WorkID"
+        scope:
+          $ref: "#/components/schemas/SearchScope"
     SearchResult:
       type: object
       required:
-        - volume
-        - workTitle
+        - workId
         - matches
       properties:
-        volume:
-          $ref: "#/components/schemas/NaturalNumber"
-        workTitle:
-          type: string
+        workId:
+          $ref: "#/components/schemas/WorkID"
         matches:
           type: array
           items:
             $ref: "#/components/schemas/Match"
+    SearchScope:
+      type: string
+      enum:
+        - paragraph
+        - sentence
     NaturalNumber:
       type: integer
       minimum: 1
-    Work:
-      allOf:
-        - $ref: "#/components/schemas/WorkBase"
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              $ref: "#/components/schemas/ID"
-    WorkBase:
+    WorkID:
+      type: string
+    WorkMetadata:
       type: object
       required:
         - title
         - volume
+        - ordinal
       properties:
+        id:
+          $ref: "#/components/schemas/WorkID"
         title:
           type: string
-        abbreviation:
-          type: string
         volume:
+          $ref: "#/components/schemas/NaturalNumber"
+        ordinal:
+          description: The position of the work in the volume
           $ref: "#/components/schemas/NaturalNumber"
         year:
           $ref: "#/components/schemas/Year"
     WorkUpload:
-      allOf:
-        - $ref: "#/components/schemas/WorkBase"
-        - type: object
-          required:
-            - text
-            - ordinal
-          properties:
-            text:
-              type: string
-            ordinal:
-              description: The position of the work in the volume
-              $ref: "#/components/schemas/NaturalNumber"
+      type: object
+      required:
+        - workId
+        - text
+      properties:
+        workId:
+          $ref: "#/components/schemas/WorkID"
+        text:
+          type: string
     Year:
       type: integer
       minimum: -999
