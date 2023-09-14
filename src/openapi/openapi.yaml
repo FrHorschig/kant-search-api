@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.8.2
+  version: 0.8.3
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -102,7 +102,7 @@ paths:
           name: workId
           required: true
           schema:
-            $ref: "#/components/schemas/WorkID"
+            $ref: "#/components/schemas/ID"
           description: ID of the work
         - in: path
           name: paragraphId
@@ -224,7 +224,7 @@ components:
           items:
             $ref: "#/components/schemas/NaturalNumber"
         workId:
-          $ref: "#/components/schemas/WorkID"
+          $ref: "#/components/schemas/ID"
     SearchCriteria:
       type: object
       required:
@@ -238,7 +238,7 @@ components:
         workIds:
           type: array
           items:
-            $ref: "#/components/schemas/WorkID"
+            $ref: "#/components/schemas/ID"
         scope:
           $ref: "#/components/schemas/SearchScope"
     SearchResult:
@@ -248,7 +248,7 @@ components:
         - matches
       properties:
         workId:
-          $ref: "#/components/schemas/WorkID"
+          $ref: "#/components/schemas/ID"
         matches:
           type: array
           items:
@@ -285,22 +285,22 @@ components:
       required:
         - id
         - title
-        - volumeId
         - ordinal
+        - volumeId
       properties:
         id:
-          $ref: "#/components/schemas/WorkID"
+          $ref: "#/components/schemas/ID"
         title:
           type: string
-        volumeId:
-          $ref: "#/components/schemas/VolumeID"
+        abbreviation:
+          type: string
         ordinal:
           description: The position of the work in the volume
           $ref: "#/components/schemas/NaturalNumber"
         year:
-          $ref: "#/components/schemas/Year"
-    WorkID:
-      type: string
+          type: string
+        volumeId:
+          $ref: "#/components/schemas/VolumeID"
     WorkUpload:
       type: object
       required:
@@ -308,10 +308,6 @@ components:
         - text
       properties:
         workId:
-          $ref: "#/components/schemas/WorkID"
+          $ref: "#/components/schemas/ID"
         text:
           type: string
-    Year:
-      type: integer
-      minimum: -999
-      maximum: 9999
