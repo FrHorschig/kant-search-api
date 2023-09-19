@@ -53,7 +53,7 @@ paths:
       tags:
         - Read
       operationId: getWorks
-      summary: Get the data of all works
+      summary: Get the data of all works, the result is sorted by volume and work ordinal
       responses:
         "200":
           description: OK
