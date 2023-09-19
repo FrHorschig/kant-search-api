@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.8.5
+  version: 0.8.7
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -121,7 +121,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /search/paragraphs:
+  /search:
     post:
       tags:
         - Search
@@ -239,6 +239,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ID"
+        scope:
+          $ref: "#/components/schemas/SearchScope"
     SearchResult:
       type: object
       required:
@@ -251,6 +253,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Match"
+    SearchScope:
+      type: string
+      enum:
+        - paragraph
+        - sentence
     NaturalNumber:
       type: integer
       minimum: 1
