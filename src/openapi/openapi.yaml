@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.10.3
+  version: 0.11.0
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -201,16 +201,20 @@ components:
     SearchCriteria:
       type: object
       required:
-        - searchTerms
         - workIds
+        - searchTerms
         - scope
       properties:
-        searchTerms:
-          type: string
         workIds:
           type: array
           items:
             $ref: "#/components/schemas/ID"
+        searchTerms:
+          type: string
+        excludedTerms:
+          type: string
+        optionalTerms:
+          type: string
         scope:
           $ref: "#/components/schemas/SearchScope"
     SearchResult:
