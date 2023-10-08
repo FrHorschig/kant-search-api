@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.14.1
+  version: 0.14.3
 servers:
   - url: https://localhost:3000/api/v1
 paths:
@@ -131,6 +131,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/HttpError"
+    NotImplemented:
+      description: The server either does not recognize the request method, or it lacks the ability to fulfil the request. Usually this implies future availability (e.g., a new feature of a web-service API).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/HttpError"
   schemas:
     ErrorCode:
       type: integer
@@ -139,14 +145,25 @@ components:
     ErrorMessage:
       type: string
       enum:
-        - BAD_REQUEST.UNEXPECTED_TOKEN
-        - BAD_REQUEST.UNEXPECTED_END_OF_INPUT
-        - BAD_REQUEST.MISSING_CLOSING_PARENTHESIS
-        - BAD_REQUEST.WRONG_STARTING_CHAR
-        - BAD_REQUEST.WRONG_ENDING_CHAR
-        - BAD_REQUEST.UNTERMINATED_DOUBLE_QUOTE
-        - NOT_FOUND
+        - BAD_REQUEST.GENERIC
+        - BAD_REQUEST.INVALID_WORK_SELECTION
+        - BAD_REQUEST.INVALID_SEARCH_CRITERIA
+        - BAD_REQUEST.EMPTY_WORKS_SELECTION
+        - BAD_REQUEST.EMPTY_SEARCH_TERMS
+        - BAD_REQUEST.EMPTY_WORK_TEXT
+        - BAD_REQUEST.SYNTAX.UNEXPECTED_TOKEN
+        - BAD_REQUEST.SYNTAX.UNEXPECTED_END_OF_INPUT
+        - BAD_REQUEST.SYNTAX.MISSING_CLOSING_PARENTHESIS
+        - BAD_REQUEST.SYNTAX.WRONG_STARTING_CHAR
+        - BAD_REQUEST.SYNTAX.WRONG_ENDING_CHAR
+        - BAD_REQUEST.SYNTAX.UNTERMINATED_DOUBLE_QUOTE
+        - NOT_FOUND.GENERIC
+        - NOT_FOUND.VOLUMES
+        - NOT_FOUND.WORKS
+        - NOT_FOUND.PARAGRAPHS
+        - NOT_FOUND.MATCHES
         - INTERNAL_SERVER_ERROR
+        - NOT_IMPLEMENTED
     HttpError:
       type: object
       required:
