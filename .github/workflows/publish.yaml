@@ -1,0 +1,77 @@
+name: Publish
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+jobs:
+  publish-go:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    env:
+      REPO_NAME: ${{ github.event.repository.name }}
+      OWNER: ${{ github.repository_owner }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: generate OpenAPI server
+        run: |
+          docker run --rm \
+            -v "${PWD}:/local" \
+            openapitools/openapi-generator-cli generate \
+            -i /local/src/openapi/openapi.yaml \
+            -o /local/src/go/ \
+            -g go-echo-server \
+            --git-user-id=${{ env.OWNER }} \
+            --git-repo-id=${{ env.REPO_NAME }}
+          sudo chown -R runner:docker .
+      - name: configure git
+        run: |
+          git config --global user.name ${{ env.OWNER }}
+          git config --global user.email ${{ secrets.GIT_EMAIL }}
+      - name: commit new models
+        run: |
+          v=$(grep "  version:" src/openapi/openapi.yaml | awk '{print $2}')
+          cd src/go
+          git add models
+          git commit -m "feat: add generated models"
+      - name: create new tag
+        run: |
+          git tag v"$v"
+          git push origin v"$v"
+
+  publish-ts:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    env:
+      REPO_NAME: ${{ github.event.repository.name }}
+      OWNER: ${{ github.repository_owner }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: generate OpenAPI client
+        run: |
+          docker run --rm \
+            -v "${PWD}:/local" \
+            openapitools/openapi-generator-cli generate \
+            -i /local/src/openapi/openapi.yaml \
+            -o /local/ \
+            -g typescript-angular \
+            -p npmName=${{ env.REPO_NAME }} \
+            -p ngVersion=15.2.0 \
+            --git-user-id=${{ env.OWNER }} \
+            --git-repo-id=${{ env.REPO_NAME }}
+          sudo chown -R runner:docker .
+      - name: set up node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: configure registry
+        run: |
+          npm config set registry https://npm.pkg.github.com
+          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
+      - name: publish generated client
+        run: |
+          sed -i '2,2s|${{ env.REPO_NAME }}|@${{ env.OWNER }}/${{ env.REPO_NAME }}|g' package.json
+          npm publish
