@@ -1,0 +1,19 @@
+name: Validate
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: validate OpenAPI spec
+        run: |
+          docker run --rm \
+            -v $PWD:/work:ro dshanley/vacuum lint \
+            src/openapi/openapi.yaml
