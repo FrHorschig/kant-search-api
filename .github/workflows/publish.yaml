@@ -70,7 +70,7 @@ jobs:
       - name: build ng packcage
         run: |
           sed -i '2,2s|${{ env.REPO_NAME }}|@${{ env.OWNER }}/${{ env.REPO_NAME }}|g' package.json
-          npm ci
+          npm install
           npm run build
       - name: configure registry
         run: |
