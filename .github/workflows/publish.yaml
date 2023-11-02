@@ -67,11 +67,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
+      - name: build ng packcage
+        run: |
+          sed -i '2,2s|${{ env.REPO_NAME }}|@${{ env.OWNER }}/${{ env.REPO_NAME }}|g' package.json
+          npm ci
+          npm run build
       - name: configure registry
         run: |
           npm config set registry https://npm.pkg.github.com
           npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
       - name: publish generated client
+        working-directory: dist
         run: |
-          sed -i '2,2s|${{ env.REPO_NAME }}|@${{ env.OWNER }}/${{ env.REPO_NAME }}|g' package.json
           npm publish
