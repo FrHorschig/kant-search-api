@@ -28,8 +28,9 @@ jobs:
           sudo chown -R runner:docker .
       - name: configure git
         run: |
-          git config --global user.name ${{ env.OWNER }}
-          git config --global user.email ${{ secrets.GIT_EMAIL }}
+          git config user.name ${{ env.OWNER }}
+          git config user.email ${{ secrets.GIT_EMAIL }}
+          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.API_ACTIONS_PAT }} | base64 --wrap=0)"
       - name: create go.sum file
         working-directory: src/go
         run: go mod tidy
@@ -39,7 +40,6 @@ jobs:
           v=$(grep "  version:" ../openapi/openapi.yaml | awk '{print $2}')
           git add go.mod go.sum models
           git commit -m "feat: add generated models"
-          git -c http.extraHeader="AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.API_ACTIONS_PAT }} | base64)" push
           git push origin main
       - name: create new tag
         run: |
