@@ -10,8 +10,8 @@ jobs:
     if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     env:
-      REPO_NAME: ${{ github.event.repository.name }}
       OWNER: ${{ github.repository_owner }}
+      REPO_NAME: ${{ github.event.repository.name }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -53,8 +53,8 @@ jobs:
     if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     env:
-      REPO_NAME: ${{ github.event.repository.name }}
       OWNER: ${{ github.repository_owner }}
+      REPO_NAME: ${{ github.event.repository.name }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
