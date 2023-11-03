@@ -35,6 +35,7 @@ jobs:
           cd src/go
           git add models
           git commit -m "feat: add generated models"
+          git push origin main
       - name: create new tag
         run: |
           v=$(grep "  version: " src/openapi/openapi.yaml | awk '{print $2}')
