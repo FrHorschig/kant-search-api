@@ -7,7 +7,6 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.merged == true && github.github.triggering_actor != 'GithubActions' }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
