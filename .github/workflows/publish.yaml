@@ -30,10 +30,13 @@ jobs:
         run: |
           git config --global user.name ${{ env.OWNER }}
           git config --global user.email ${{ secrets.GIT_EMAIL }}
+      - name: create go.sum file
+        working-directory: src/go
+        run: go mod tidy
       - name: commit new models
+        working-directory: src/go
         run: |
-          v=$(grep "  version:" src/openapi/openapi.yaml | awk '{print $2}')
-          cd src/go
+          v=$(grep "  version:" ../openapi/openapi.yaml | awk '{print $2}')
           git add go.mod go.sum models
           git commit -m "feat: add generated models"
           git -c http.extraHeader="AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.API_ACTIONS_PAT }} | base64)" push
