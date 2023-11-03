@@ -28,17 +28,19 @@ jobs:
             --git-repo-id=${{ env.REPO_NAME }}
           sudo chown -R runner:docker .
       - name: create go.sum file
-        run: |
-          cd src/go
-          go mod tidy
+        working-directory: src/go
+        run: go mod tidy
       - name: configure git
-        run: |
-          git config --global user.name GithubActions
+        run: git config --global user.name GithubActions
+      - run: ls -la
+        working-directory: src/go
       - name: commit new models
+        working-directory: src/go
         run: |
-          cd src/go
-          git add models
           git add go.mod
           git add go.sum
+          git add models
+      - run: git status
+      - run: |
           git commit -m "feat: add generated models"
           git push
