@@ -7,13 +7,38 @@ on:
 
 jobs:
   publish-go:
+    if: github.event.pull_request.merged
     runs-on: ubuntu-latest
+    env:
+      REPO_NAME: ${{ github.event.repository.name }}
+      OWNER: ${{ github.repository_owner }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: generate OpenAPI server
+        run: |
+          docker run --rm \
+            -v "${PWD}:/local" \
+            openapitools/openapi-generator-cli generate \
+            -i /local/src/openapi/openapi.yaml \
+            -o /local/src/go/ \
+            -g go-echo-server \
+            --git-user-id=${{ env.OWNER }} \
+            --git-repo-id=${{ env.REPO_NAME }}
+          sudo chown -R runner:docker .
+      - name: configure git
+        run: |
+          git config --global user.name ${{ env.OWNER }}
+          git config --global user.email ${{ secrets.GIT_EMAIL }}
+      - name: commit new models
+        run: |
+          v=$(grep "  version:" src/openapi/openapi.yaml | awk '{print $2}')
+          cd src/go
+          git add go.mod go.sum models
+          git commit -m "feat: add generated models"
+          git push origin main
       - name: create new tag
         run: |
-          v=$(grep "  version: " src/openapi/openapi.yaml | awk '{print $2}')
           git tag v"$v"
           git push origin v"$v"
 
