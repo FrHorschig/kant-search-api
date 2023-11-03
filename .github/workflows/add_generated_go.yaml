@@ -6,6 +6,7 @@ on:
 
 jobs:
   add-generated-go:
+    if: ${{ github.github.triggering_actor != 'GithubActions' }}
     runs-on: ubuntu-latest
     env:
       REPO_NAME: ${{ github.event.repository.name }}
@@ -32,8 +33,7 @@ jobs:
           go mod tidy
       - name: configure git
         run: |
-          git config --global user.name ${{ env.OWNER }}
-          git config --global user.email ${{ secrets.GIT_EMAIL }}
+          git config --global user.name GithubActions
       - name: commit new models
         run: |
           cd src/go
