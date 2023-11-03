@@ -36,6 +36,7 @@ jobs:
           cd src/go
           git add go.mod go.sum models
           git commit -m "feat: add generated models"
+          git -c http.extraHeader="AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.API_ACTIONS_PAT }} | base64)" push
           git push origin main
       - name: create new tag
         run: |
