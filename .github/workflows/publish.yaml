@@ -35,7 +35,7 @@ jobs:
         working-directory: src/go
         run: |
           owner_lower=$(echo "${{ env.OWNER }}" | tr '[:upper:]' '[:lower:]')
-          sed -i '' 's|module github.com/"$owner_lower"/${{ env.REPO_NAME }}|module github.com/"$owner_lower"/${{ env.REPO_NAME }}/src/go|' go.mod
+          sed -i 's|module github.com/"$owner_lower"/${{ env.REPO_NAME }}|module github.com/"$owner_lower"/${{ env.REPO_NAME }}/src/go|' go.mod
           go mod tidy
       - name: commit new models
         working-directory: src/go
