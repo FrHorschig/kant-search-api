@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: make owner lowercase
+        run: |
+          echo "OWNER=$(echo $OWNER | awk '{print tolower($0)}')" >> $GITHUB_ENV
       - name: generate OpenAPI server
         run: |
           docker run --rm \
