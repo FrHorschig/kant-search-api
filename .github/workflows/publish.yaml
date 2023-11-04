@@ -61,6 +61,9 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: make owner lowercase
+        run: |
+          echo "OWNER=$(echo $OWNER | awk '{print tolower($0)}')" >> $GITHUB_ENV
       - name: generate OpenAPI client
         run: |
           docker run --rm \
@@ -78,7 +81,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
-      - name: build ng packcage
+      - name: build ng package
         run: |
           sed -i '2,2s|${{ env.REPO_NAME }}|@${{ env.OWNER }}/${{ env.REPO_NAME }}|g' package.json
           npm install
