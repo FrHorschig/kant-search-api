@@ -10,11 +10,14 @@ jobs:
     if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     env:
-      REPO_NAME: ${{ github.event.repository.name }}
       OWNER: ${{ github.repository_owner }}
+      REPO_NAME: ${{ github.event.repository.name }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: make owner lowercase
+        run: |
+          echo "OWNER=$(echo $OWNER | awk '{print tolower($0)}')" >> $GITHUB_ENV
       - name: generate OpenAPI server
         run: |
           docker run --rm \
@@ -28,28 +31,39 @@ jobs:
           sudo chown -R runner:docker .
       - name: configure git
         run: |
-          git config --global user.name ${{ env.OWNER }}
-          git config --global user.email ${{ secrets.GIT_EMAIL }}
-      - name: commit new models
+          git config user.name ${{ env.OWNER }}
+          git config user.email ${{ secrets.GIT_EMAIL }}
+          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.API_ACTIONS_PAT }} | base64 --wrap=0)"
+      - name: adjust generated Go code
+        working-directory: src/go
         run: |
-          v=$(grep "  version:" src/openapi/openapi.yaml | awk '{print $2}')
-          cd src/go
-          git add models
+          rm main.go handlers/ models/hello-world.go -r
+          sed -i 's|module github.com/${{ env.OWNER }}/${{ env.REPO_NAME }}|module github.com/${{ env.OWNER }}/${{ env.REPO_NAME }}/src/go|' go.mod
+          go mod tidy
+      - name: commit new models
+        working-directory: src/go
+        run: |
+          git add go.mod models
           git commit -m "feat: add generated models"
+          git push origin main
       - name: create new tag
         run: |
-          git tag v"$v"
-          git push origin v"$v"
+          version=$(grep "  version:" src/openapi/openapi.yaml | awk '{print $2}')
+          git tag v"$version"
+          git push origin v"$version"
 
   publish-ts:
     if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     env:
-      REPO_NAME: ${{ github.event.repository.name }}
       OWNER: ${{ github.repository_owner }}
+      REPO_NAME: ${{ github.event.repository.name }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: make owner lowercase
+        run: |
+          echo "OWNER=$(echo $OWNER | awk '{print tolower($0)}')" >> $GITHUB_ENV
       - name: generate OpenAPI client
         run: |
           docker run --rm \
@@ -67,11 +81,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
+      - name: build ng package
+        run: |
+          sed -i '2,2s|${{ env.REPO_NAME }}|@${{ env.OWNER }}/${{ env.REPO_NAME }}|g' package.json
+          npm install
+          npm run build
       - name: configure registry
         run: |
           npm config set registry https://npm.pkg.github.com
           npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
       - name: publish generated client
+        working-directory: dist
         run: |
-          sed -i '2,2s|${{ env.REPO_NAME }}|@${{ env.OWNER }}/${{ env.REPO_NAME }}|g' package.json
           npm publish
