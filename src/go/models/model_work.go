@@ -4,7 +4,7 @@ type Work struct {
 
 	Id int32 `json:"id"`
 
-	Title string `json:"title"`
+	Code string `json:"code"`
 
 	Abbreviation string `json:"abbreviation,omitempty"`
 
