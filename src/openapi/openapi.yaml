@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.15.2
+  version: 0.16.0
 servers:
   - url: https://localhost:3000/api/v1
 tags:
@@ -280,13 +280,10 @@ components:
       type: object
       required:
         - id
-        - title
         - section
       properties:
         id:
           $ref: "#/components/schemas/VolumeID"
-        title:
-          type: string
         section:
           $ref: "#/components/schemas/VolumeSection"
     VolumeID:
@@ -299,13 +296,13 @@ components:
       type: object
       required:
         - id
-        - title
+        - code
         - ordinal
         - volumeId
       properties:
         id:
           $ref: "#/components/schemas/ID"
-        title:
+        code:
           type: string
         abbreviation:
           type: string
