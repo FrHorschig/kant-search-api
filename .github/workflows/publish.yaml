@@ -49,8 +49,8 @@ jobs:
       - name: create new tag
         run: |
           version=$(grep "  version:" src/openapi/openapi.yaml | awk '{print $2}')
-          git tag v"$version"
-          git push origin v"$version"
+          git tag src/go/v"$version"
+          git push origin src/go/v"$version"
 
   publish-ts:
     if: github.event.pull_request.merged
