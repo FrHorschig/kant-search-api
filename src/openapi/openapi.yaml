@@ -2,16 +2,16 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: An API for the KantSearch backend.
-  version: 0.16.0
+  version: 0.16.1
 servers:
   - url: https://localhost:3000/api/v1
 tags:
   - name: Read
-    description: Read operations
+    description: operations to load full texts
   - name: Search
-    description: Search operations
+    description: operations for searching
   - name: Upload
-    description: Upload operations
+    description: operations for text upload
 paths:
   /volumes:
     get:
@@ -21,7 +21,7 @@ paths:
       summary: Get the data of all volumes
       responses:
         "200":
-          description: Returns the data of all volumes
+          description: OK
           content:
             application/json:
               schema:
@@ -31,25 +31,6 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
   /works:
-    post:
-      tags:
-        - Upload
-      operationId: uploadWork
-      summary: Post the text of work
-      requestBody:
-        description: The text to upload
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/WorkUpload"
-      responses:
-        "204":
-          description: No content
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
     get:
       tags:
         - Read
@@ -64,6 +45,39 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Work"
+        "204":
+          description: The server successfully processed the request, and is not returning any content.
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /works/{workId}:
+    post:
+      tags:
+        - Upload
+      operationId: uploadWork
+      summary: Post the text of a work
+      parameters:
+        - in: path
+          name: workId
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID"
+          description: ID of the work
+      requestBody:
+        description: The text to upload in XML format
+        required: true
+        content:
+          # TODO frhorschig: check if XML will be used
+          application/xml:
+            schema:
+              type: string
+              format: xml
+      responses:
+        "202":
+          description: Accepted, processing of the text is done asynchronously
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
   /works/{workId}/paragraphs:
@@ -71,7 +85,7 @@ paths:
       tags:
         - Read
       operationId: getParagraphs
-      summary: Get paragraphs of a the text of a work
+      summary: Get the text of a work in paragraphs
       parameters:
         - in: path
           name: workId
@@ -107,7 +121,7 @@ paths:
               $ref: "#/components/schemas/SearchCriteria"
       responses:
         "200":
-          description: Returns the search results
+          description: Returns the search results, the array is empty if no result is found
           content:
             application/json:
               schema:
@@ -145,6 +159,7 @@ components:
       maximum: 599
     ErrorMessage:
       type: string
+      # TODO frhorschig: adjust when rewriting text processing
       enum:
         - BAD_REQUEST.GENERIC
         - BAD_REQUEST.INVALID_WORK_SELECTION
@@ -211,6 +226,9 @@ components:
           $ref: "#/components/schemas/ID"
         sentenceId:
           $ref: "#/components/schemas/ID"
+    NaturalNumber:
+      type: integer
+      minimum: 1
     Paragraph:
       type: object
       required:
@@ -273,9 +291,6 @@ components:
       enum:
         - PARAGRAPH
         - SENTENCE
-    NaturalNumber:
-      type: integer
-      minimum: 1
     Volume:
       type: object
       required:
@@ -289,9 +304,11 @@ components:
     VolumeID:
       type: integer
       minimum: 1
+      maximum: 23
     VolumeSection:
       type: integer
       minimum: 1
+      maximum: 3
     Work:
       type: object
       required:
@@ -312,13 +329,3 @@ components:
           type: string
         volumeId:
           $ref: "#/components/schemas/VolumeID"
-    WorkUpload:
-      type: object
-      required:
-        - workId
-        - text
-      properties:
-        workId:
-          $ref: "#/components/schemas/ID"
-        text:
-          type: string
