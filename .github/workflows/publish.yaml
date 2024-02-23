@@ -72,7 +72,7 @@ jobs:
             -o /local/ \
             -g typescript-angular \
             -p npmName=${{ env.REPO_NAME }} \
-            -p ngVersion=15.2.0 \
+            -p ngVersion=17.2.2 \
             --git-user-id=${{ env.OWNER }} \
             --git-repo-id=${{ env.REPO_NAME }}
           sudo chown -R runner:docker .
