@@ -39,6 +39,7 @@ jobs:
         run: |
           rm main.go handlers/ models/hello-world.go -r
           sed -i 's|module github.com/${{ env.OWNER }}/${{ env.REPO_NAME }}|module github.com/${{ env.OWNER }}/${{ env.REPO_NAME }}/src/go|' go.mod
+          go mod edit -go=1.22
           go mod tidy
       - name: commit new models
         working-directory: src/go
