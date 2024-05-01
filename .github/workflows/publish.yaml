@@ -24,7 +24,7 @@ jobs:
             -v "${PWD}:/local" \
             openapitools/openapi-generator-cli generate \
             -i /local/src/openapi/openapi.yaml \
-            -o /local/src/go/ \
+            -o /local/generated/go/ \
             -g go-echo-server \
             --git-user-id=${{ env.OWNER }} \
             --git-repo-id=${{ env.REPO_NAME }}
@@ -35,22 +35,22 @@ jobs:
           git config user.email ${{ secrets.GIT_EMAIL }}
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.API_ACTIONS_PAT }} | base64 --wrap=0)"
       - name: adjust generated Go code
-        working-directory: src/go
+        working-directory: generated/go
         run: |
           rm main.go handlers/ models/hello-world.go -r
-          sed -i 's|module github.com/${{ env.OWNER }}/${{ env.REPO_NAME }}|module github.com/${{ env.OWNER }}/${{ env.REPO_NAME }}/src/go|' go.mod
+          sed -i 's|module github.com/${{ env.OWNER }}/${{ env.REPO_NAME }}|module github.com/${{ env.OWNER }}/${{ env.REPO_NAME }}/generated/go|' go.mod
           go mod edit -go=1.21
           go mod tidy
       - name: commit new models
-        working-directory: src/go
+        working-directory: generated/go
         run: |
           git add go.mod models
           git diff --staged --quiet || (git commit -m "feat: add generated models" && git push origin main)
       - name: create new tag
         run: |
           version=$(grep "  version:" src/openapi/openapi.yaml | awk '{print $2}')
-          git tag src/go/v"$version"
-          git push origin src/go/v"$version"
+          git tag generated/go/v"$version"
+          git push origin generated/go/v"$version"
 
   publish-ts:
     if: github.event.pull_request.merged
