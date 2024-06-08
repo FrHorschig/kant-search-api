@@ -66,7 +66,6 @@ paths:
         description: The text to upload in XML format
         required: true
         content:
-          # TODO frhorschig: check if XML will be used
           application/xml:
             schema:
               type: string
@@ -159,7 +158,6 @@ components:
       maximum: 599
     ErrorMessage:
       type: string
-      # TODO frhorschig: adjust when rewriting text processing
       enum:
         - BAD_REQUEST.GENERIC
         - BAD_REQUEST.INVALID_WORK_SELECTION
