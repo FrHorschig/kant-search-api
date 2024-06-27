@@ -45,7 +45,7 @@ jobs:
         working-directory: generated/go
         run: |
           git add go.mod models
-          git diff --staged --quiet || (git commit -m "feat: add generated models" && git push origin main)
+          git diff --staged --quiet || (git commit -m "chore: add generated models" && git push origin main)
       - name: create new tag
         run: |
           version=$(grep "  version:" src/openapi/openapi.yaml | awk '{print $2}')
