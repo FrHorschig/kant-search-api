@@ -1,17 +1,15 @@
 openapi: 3.0.0
 info:
   title: KantSearch API
-  description: An API for the KantSearch backend.
-  version: 0.18.0
+  description: The API for reading data from the KantSearch backend.
+  version: 0.19.0
 servers:
-  - url: https://localhost:3000/api/v1
+  - url: https://localhost:3000/api/read/v1
 tags:
   - name: Read
     description: operations to load full texts
   - name: Search
     description: operations for searching
-  - name: Upload
-    description: operations for text upload
 paths:
   /volumes:
     get:
@@ -47,36 +45,6 @@ paths:
                   $ref: "#/components/schemas/Work"
         "204":
           description: The server successfully processed the request, and is not returning any content.
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-  /works/{workId}:
-    post:
-      tags:
-        - Upload
-      operationId: uploadWork
-      summary: Post the text of a work
-      parameters:
-        - in: path
-          name: workId
-          required: true
-          schema:
-            $ref: "#/components/schemas/ID"
-          description: ID of the work
-      requestBody:
-        description: The text to upload in XML format
-        required: true
-        content:
-          application/xml:
-            schema:
-              type: string
-              format: xml
-      responses:
-        "202":
-          description: Accepted, processing of the text is done asynchronously
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
   /works/{workId}/paragraphs:
@@ -165,17 +133,12 @@ components:
         - BAD_REQUEST.EMPTY_WORKS_SELECTION
         - BAD_REQUEST.EMPTY_SEARCH_TERMS
         - BAD_REQUEST.EMPTY_WORK_TEXT
-        - BAD_REQUEST.COMMON.WRONG_STARTING_CHAR
+        - BAD_REQUEST.SYNTAX.WRONG_STARTING_CHAR
         - BAD_REQUEST.SYNTAX.UNEXPECTED_TOKEN
         - BAD_REQUEST.SYNTAX.UNEXPECTED_END_OF_INPUT
         - BAD_REQUEST.SYNTAX.MISSING_CLOSING_PARENTHESIS
         - BAD_REQUEST.SYNTAX.WRONG_ENDING_CHAR
         - BAD_REQUEST.SYNTAX.UNTERMINATED_DOUBLE_QUOTE
-        - BAD_REQUEST.UPLOAD.MISSING_EXPR_TYPE
-        - BAD_REQUEST.UPLOAD.MISSING_CLOSING_BRACE
-        - BAD_REQUEST.UPLOAD.WRONG_START_EXPRESSION
-        - BAD_REQUEST.UPLOAD.WRONG_END_EXPRESSION
-        - BAD_REQUEST.UPLOAD.UNKNOWN_EXPRESSION_CLASS
         - NOT_FOUND.GENERIC
         - NOT_FOUND.VOLUMES
         - NOT_FOUND.WORKS
