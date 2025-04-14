@@ -8,8 +8,6 @@ servers:
 tags:
   - name: Read
     description: operations to load full texts
-  - name: Search
-    description: operations for searching
 paths:
   /volumes:
     get:
@@ -289,7 +287,6 @@ components:
           items:
             $ref: '#/components/schemas/WorkRef'
       required:
-        - id
         - volumeNumber
         - section
         - title
@@ -311,16 +308,19 @@ components:
           type: string
         abbreviation:
           type: string
-          nullable: true
         title:
           type: string
         year:
           type: string
-          nullable: true
         sections:
           type: array
           items:
             $ref: '#/components/schemas/Section'
+      required:
+        - id
+        - code
+        - title
+        - sections
     WorkRef:
       type: object
       properties:
