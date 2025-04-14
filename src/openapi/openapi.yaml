@@ -2,9 +2,9 @@ openapi: 3.0.0
 info:
   title: KantSearch API
   description: The API for reading data from the KantSearch backend.
-  version: 0.19.0
+  version: 0.20.0
 servers:
-  - url: https://localhost:3000/api/read/v1
+  - url: https://localhost:3000/api/v1
 tags:
   - name: Read
     description: operations to load full texts
@@ -28,15 +28,22 @@ paths:
                   $ref: "#/components/schemas/Volume"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /works:
+  /works/{workId}:
     get:
       tags:
         - Read
-      operationId: getWorks
-      summary: Get the data of all works
+      operationId: getWork
+      summary: Get the data of a work
+      parameters:
+        - in: path
+          name: workId
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID"
+          description: ID of the work
       responses:
         "200":
-          description: Returns the data of all works sorted by volume and work ordinal
+          description: Returns the metadata and the structural data of the work
           content:
             application/json:
               schema:
@@ -47,12 +54,64 @@ paths:
           description: The server successfully processed the request, and is not returning any content.
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /works/{workId}/footnote:
+    get:
+      tags:
+        - Read
+      operationId: getFootnotes
+      summary: Get the data of all footnotes of a work
+      parameters:
+        - in: path
+          name: workId
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID"
+          description: ID of the work
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Footnote"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /works/{workId}/headings:
+    get:
+      tags:
+        - Read
+      operationId: getHeadings
+      summary: Get the data of all headings of a work
+      parameters:
+        - in: path
+          name: workId
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID"
+          description: ID of the work
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Heading"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /works/{workId}/paragraphs:
     get:
       tags:
         - Read
       operationId: getParagraphs
-      summary: Get the text of a work in paragraphs
+      summary: Get the data of all paragraphs of a work
       parameters:
         - in: path
           name: workId
@@ -73,30 +132,30 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /search:
-    post:
+  /works/{workId}/summary:
+    get:
       tags:
-        - Search
-      operationId: search
-      summary: Post the search criteria
-      requestBody:
-        description: The search criteria
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SearchCriteria"
+        - Read
+      operationId: getSummaries
+      summary: Get the data of all summaries of a work
+      parameters:
+        - in: path
+          name: workId
+          required: true
+          schema:
+            $ref: "#/components/schemas/ID"
+          description: ID of the work
       responses:
         "200":
-          description: Returns the search results, the array is empty if no result is found
+          description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/SearchResult"
-        "400":
-          $ref: "#/components/responses/BadRequest"
+                  $ref: "#/components/schemas/Summary"
+        "404":
+          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
 components:
@@ -124,32 +183,34 @@ components:
       type: integer
       minimum: 400
       maximum: 599
-    ErrorMessage:
-      type: string
-      enum:
-        - BAD_REQUEST.GENERIC
-        - BAD_REQUEST.INVALID_WORK_SELECTION
-        - BAD_REQUEST.INVALID_SEARCH_CRITERIA
-        - BAD_REQUEST.EMPTY_WORKS_SELECTION
-        - BAD_REQUEST.EMPTY_SEARCH_TERMS
-        - BAD_REQUEST.EMPTY_WORK_TEXT
-        - BAD_REQUEST.SYNTAX.WRONG_STARTING_CHAR
-        - BAD_REQUEST.SYNTAX.UNEXPECTED_TOKEN
-        - BAD_REQUEST.SYNTAX.UNEXPECTED_END_OF_INPUT
-        - BAD_REQUEST.SYNTAX.MISSING_CLOSING_PARENTHESIS
-        - BAD_REQUEST.SYNTAX.WRONG_ENDING_CHAR
-        - BAD_REQUEST.SYNTAX.UNTERMINATED_DOUBLE_QUOTE
-        - NOT_FOUND.GENERIC
-        - NOT_FOUND.VOLUMES
-        - NOT_FOUND.WORKS
-        - NOT_FOUND.PARAGRAPHS
-        - NOT_FOUND.MATCHES
-        - INTERNAL_SERVER_ERROR
-        - NOT_IMPLEMENTED
-    HeadingLevel:
-      type: integer
-      minimum: 1
-      maximum: 6
+    Footnote:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        ref:
+          type: string
+        text:
+          type: string
+      required:
+        - id
+        - ref
+        - text
+    Heading:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        text:
+          type: string
+        fnRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ID'
+      required:
+        - id
+        - text
+        - fnRefs
     HttpError:
       type: object
       required:
@@ -159,110 +220,81 @@ components:
         code:
           $ref: "#/components/schemas/ErrorCode"
         message:
-          $ref: "#/components/schemas/ErrorMessage"
+          type: string
         params:
           type: array
           items:
             type: string
     ID:
-      type: integer
-      minimum: 0
-    Match:
-      type: object
-      required:
-        - snippet
-        - text
-        - pages
-        - paragraphId
-      properties:
-        snippet:
-          type: string
-        text:
-          type: string
-        pages:
-          type: array
-          items:
-            $ref: "#/components/schemas/NaturalNumber"
-        paragraphId:
-          $ref: "#/components/schemas/ID"
-        sentenceId:
-          $ref: "#/components/schemas/ID"
-    NaturalNumber:
-      type: integer
-      minimum: 1
+      type: string
     Paragraph:
       type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        text:
+          type: string
+        fnRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ID'
+        summaryRef:
+          type: string
       required:
         - id
         - text
-        - pages
-        - workId
+    Section:
+      type: object
+      properties:
+        heading:
+          $ref: '#/components/schemas/ID'
+        paragraphs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ID'
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Section'
+      required:
+        - heading
+    Summary:
+      type: object
       properties:
         id:
-          $ref: "#/components/schemas/ID"
+          $ref: '#/components/schemas/ID'
+        ref:
+          type: string
         text:
           type: string
-        pages:
+        fnRefs:
           type: array
           items:
-            $ref: "#/components/schemas/NaturalNumber"
-        workId:
-          $ref: "#/components/schemas/ID"
-        headingLevel:
-          $ref: "#/components/schemas/HeadingLevel"
-        footnoteName:
-          type: string
-    SearchCriteria:
-      type: object
-      required:
-        - workIds
-        - searchString
-        - options
-      properties:
-        workIds:
-          type: array
-          items:
-            $ref: "#/components/schemas/ID"
-        searchString:
-          type: string
-          maxLength: 1000
-        options:
-          $ref: "#/components/schemas/SearchOptions"
-    SearchOptions:
-      type: object
-      required:
-        - scope
-      properties:
-        scope:
-          $ref: "#/components/schemas/SearchScope"
-    SearchResult:
-      type: object
-      required:
-        - workId
-        - matches
-      properties:
-        workId:
-          $ref: "#/components/schemas/ID"
-        matches:
-          type: array
-          items:
-            $ref: "#/components/schemas/Match"
-    SearchScope:
-      type: string
-      enum:
-        - PARAGRAPH
-        - SENTENCE
-    Volume:
-      type: object
+            type: string
       required:
         - id
-        - section
+        - ref
+        - text
+    Volume:
+      type: object
       properties:
-        id:
-          $ref: "#/components/schemas/VolumeID"
+        volumeNumber:
+          $ref: '#/components/schemas/VolumeNumber'
         section:
-          $ref: "#/components/schemas/VolumeSection"
-    VolumeID:
+          $ref: '#/components/schemas/VolumeSection'
+        title:
+          type: string
+        works:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkRef'
+      required:
+        - id
+        - volumeNumber
+        - section
+        - title
+        - works
+    VolumeNumber:
       type: integer
       minimum: 1
       maximum: 23
@@ -272,21 +304,33 @@ components:
       maximum: 3
     Work:
       type: object
-      required:
-        - id
-        - code
-        - ordinal
-        - volumeId
       properties:
         id:
-          $ref: "#/components/schemas/ID"
+          $ref: '#/components/schemas/ID'
         code:
           type: string
         abbreviation:
           type: string
-        ordinal:
-          $ref: "#/components/schemas/NaturalNumber"
+          nullable: true
+        title:
+          type: string
         year:
           type: string
-        volumeId:
-          $ref: "#/components/schemas/VolumeID"
+          nullable: true
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Section'
+    WorkRef:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        code:
+          type: string
+        title:
+          type: string
+      required:
+        - id
+        - code
+        - title
