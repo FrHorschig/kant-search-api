@@ -7,7 +7,9 @@ servers:
   - url: https://localhost:3000/api/v1
 tags:
   - name: Read
-    description: operations to load full texts
+    description: operations to text data
+  - name: Search
+    description: operations for searching
 paths:
   /volumes:
     get:
@@ -156,6 +158,32 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /search:
+    post:
+      tags:
+        - Search
+      operationId: search
+      summary: Post the search criteria
+      requestBody:
+        description: The search criteria
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchCriteria"
+      responses:
+        "200":
+          description: Returns the search results, the array is empty if no result is found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 components:
   responses:
     BadRequest:
@@ -183,6 +211,10 @@ components:
       maximum: 599
     Footnote:
       type: object
+      required:
+        - id
+        - ref
+        - text
       properties:
         id:
           $ref: '#/components/schemas/ID'
@@ -190,12 +222,12 @@ components:
           type: string
         text:
           type: string
-      required:
-        - id
-        - ref
-        - text
     Heading:
       type: object
+      required:
+        - id
+        - text
+        - fnRefs
       properties:
         id:
           $ref: '#/components/schemas/ID'
@@ -205,10 +237,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ID'
-      required:
-        - id
-        - text
-        - fnRefs
     HttpError:
       type: object
       required:
@@ -221,6 +249,26 @@ components:
           type: string
     ID:
       type: string
+    Match:
+      type: object
+      required:
+        - snippet
+        - text
+        - pages
+        - paragraphId
+      properties:
+        snippet:
+          type: string
+        text:
+          type: string
+        pages:
+          type: array
+          items:
+            type: number
+        paragraphId:
+          $ref: "#/components/schemas/ID"
+        sentenceId:
+          $ref: "#/components/schemas/ID"
     Paragraph:
       type: object
       properties:
@@ -237,8 +285,52 @@ components:
       required:
         - id
         - text
+    SearchCriteria:
+      type: object
+      required:
+        - workIds
+        - searchString
+        - options
+      properties:
+        workIds:
+          type: array
+          items:
+            $ref: "#/components/schemas/ID"
+        searchString:
+          type: string
+          maxLength: 1000
+        options:
+          $ref: "#/components/schemas/SearchOptions"
+    SearchOptions:
+      type: object
+      required:
+        - scope
+        - includeHeadings
+      properties:
+        scope:
+          $ref: "#/components/schemas/SearchScope"
+        includeHeadings:
+          type: boolean
+    SearchResult:
+      type: object
+      required:
+        - workId
+        - matches
+      properties:
+        workId:
+          $ref: "#/components/schemas/ID"
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/Match"
+    SearchScope:
+      type: string
+      enum:
+        - PARAGRAPH
     Section:
       type: object
+      required:
+        - heading
       properties:
         heading:
           $ref: '#/components/schemas/ID'
@@ -250,10 +342,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Section'
-      required:
-        - heading
     Summary:
       type: object
+      required:
+        - id
+        - ref
+        - text
       properties:
         id:
           $ref: '#/components/schemas/ID'
@@ -265,12 +359,13 @@ components:
           type: array
           items:
             type: string
-      required:
-        - id
-        - ref
-        - text
     Volume:
       type: object
+      required:
+        - volumeNumber
+        - section
+        - title
+        - works
       properties:
         volumeNumber:
           $ref: '#/components/schemas/VolumeNumber'
@@ -282,11 +377,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WorkRef'
-      required:
-        - volumeNumber
-        - section
-        - title
-        - works
     VolumeNumber:
       type: integer
       minimum: 1
@@ -297,6 +387,11 @@ components:
       maximum: 3
     Work:
       type: object
+      required:
+        - id
+        - code
+        - title
+        - sections
       properties:
         id:
           $ref: '#/components/schemas/ID'
@@ -312,13 +407,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Section'
+    WorkRef:
+      type: object
       required:
         - id
         - code
         - title
-        - sections
-    WorkRef:
-      type: object
       properties:
         id:
           $ref: '#/components/schemas/ID'
@@ -326,7 +420,3 @@ components:
           type: string
         title:
           type: string
-      required:
-        - id
-        - code
-        - title
