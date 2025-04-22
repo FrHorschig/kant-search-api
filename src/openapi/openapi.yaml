@@ -173,7 +173,7 @@ paths:
               $ref: "#/components/schemas/SearchCriteria"
       responses:
         "200":
-          description: Returns the search results, the array is empty if no result is found
+          description: Returns the search results, the array is empty if no result is found. The list or results is given in the same order as the input workIDs.
           content:
             application/json:
               schema:
@@ -209,6 +209,22 @@ components:
       type: integer
       minimum: 400
       maximum: 599
+    ErrorMessage:
+      type: string
+      enum:
+        - BAD_REQUEST.GENERIC
+        - BAD_REQUEST.INVALID_SEARCH_CRITERIA
+        - BAD_REQUEST.EMPTY_WORKS_SELECTION
+        - BAD_REQUEST.EMPTY_SEARCH_TERMS
+        - BAD_REQUEST.SYNTAX.WRONG_STARTING_CHAR
+        - BAD_REQUEST.SYNTAX.UNEXPECTED_TOKEN
+        - BAD_REQUEST.SYNTAX.UNEXPECTED_END_OF_INPUT
+        - BAD_REQUEST.SYNTAX.MISSING_CLOSING_PARENTHESIS
+        - BAD_REQUEST.SYNTAX.WRONG_ENDING_CHAR
+        - BAD_REQUEST.SYNTAX.UNTERMINATED_DOUBLE_QUOTE
+        - NOT_FOUND.GENERIC
+        - NOT_FOUND.VOLUMES
+        - NOT_FOUND.WORK
     Footnote:
       type: object
       required:
@@ -225,18 +241,38 @@ components:
     Heading:
       type: object
       required:
+        - fnRefs
         - id
         - text
-        - fnRefs
+        - tocText
       properties:
-        id:
-          $ref: '#/components/schemas/ID'
-        text:
-          type: string
         fnRefs:
           type: array
           items:
             $ref: '#/components/schemas/ID'
+        id:
+          $ref: '#/components/schemas/ID'
+        text:
+          type: string
+        tocText:
+          type: string
+    Hit:
+      type: object
+      required:
+        - contentId
+        - pages
+        - snippets
+      properties:
+        contentId:
+          $ref: "#/components/schemas/ID"
+        pages:
+          type: array
+          items:
+            $ref: "#/components/schemas/NaturalNumber"
+        snippet:
+          type: array
+          items:
+            type: string
     HttpError:
       type: object
       required:
@@ -246,83 +282,76 @@ components:
         code:
           $ref: "#/components/schemas/ErrorCode"
         message:
-          type: string
-    ID:
-      type: string
-    Match:
-      type: object
-      required:
-        - snippet
-        - text
-        - pages
-        - paragraphId
-      properties:
-        snippet:
-          type: string
-        text:
-          type: string
-        pages:
+          $ref: "#/components/schemas/ErrorMessage"
+        params:
           type: array
           items:
-            type: number
-        paragraphId:
-          $ref: "#/components/schemas/ID"
-        sentenceId:
-          $ref: "#/components/schemas/ID"
+            type: string
+    ID:
+      type: string
+    NaturalNumber:
+      type: integer
+      minimum: 1
     Paragraph:
       type: object
+      required:
+        - id
+        - text
       properties:
-        id:
-          $ref: '#/components/schemas/ID'
-        text:
-          type: string
         fnRefs:
           type: array
           items:
             $ref: '#/components/schemas/ID'
+        id:
+          $ref: '#/components/schemas/ID'
+        text:
+          type: string
         summaryRef:
           type: string
-      required:
-        - id
-        - text
     SearchCriteria:
       type: object
       required:
-        - workIds
-        - searchString
         - options
+        - searchString
       properties:
+        options:
+          $ref: "#/components/schemas/SearchOptions"
+        searchString:
+          type: string
+          maxLength: 1000
+    SearchOptions:
+      type: object
+      required:
+        - includeHeadings
+        - includeFootnotes
+        - includeSummaries
+        - scope
+        - workIds
+      properties:
+        includeHeadings:
+          type: boolean
+        includeFootnotes:
+          type: boolean
+        includeSummaries:
+          type: boolean
+        scope:
+          $ref: "#/components/schemas/SearchScope"
         workIds:
           type: array
           items:
             $ref: "#/components/schemas/ID"
-        searchString:
-          type: string
-          maxLength: 1000
-        options:
-          $ref: "#/components/schemas/SearchOptions"
-    SearchOptions:
-      type: object
-      required:
-        - scope
-        - includeHeadings
-      properties:
-        scope:
-          $ref: "#/components/schemas/SearchScope"
-        includeHeadings:
-          type: boolean
     SearchResult:
       type: object
       required:
+        - hits
         - workId
-        - matches
       properties:
-        workId:
-          $ref: "#/components/schemas/ID"
-        matches:
+        hits:
           type: array
           items:
-            $ref: "#/components/schemas/Match"
+            $ref: "#/components/schemas/Hit"
+        workId:
+          $ref: "#/components/schemas/ID"
     SearchScope:
       type: string
       enum:
@@ -349,30 +378,30 @@ components:
         - ref
         - text
       properties:
+        fnRefs:
+          type: array
+          items:
+            type: string
         id:
           $ref: '#/components/schemas/ID'
         ref:
           type: string
         text:
           type: string
-        fnRefs:
-          type: array
-          items:
-            type: string
     Volume:
       type: object
       required:
-        - volumeNumber
         - section
         - title
+        - volumeNumber
         - works
       properties:
-        volumeNumber:
-          $ref: '#/components/schemas/VolumeNumber'
         section:
           $ref: '#/components/schemas/VolumeSection'
         title:
           type: string
+        volumeNumber:
+          $ref: '#/components/schemas/VolumeNumber'
         works:
           type: array
           items:
@@ -388,35 +417,35 @@ components:
     Work:
       type: object
       required:
-        - id
         - code
-        - title
+        - id
         - sections
+        - title
       properties:
+        abbreviation:
+          type: string
         id:
           $ref: '#/components/schemas/ID'
         code:
-          type: string
-        abbreviation:
-          type: string
-        title:
-          type: string
-        year:
           type: string
         sections:
           type: array
           items:
             $ref: '#/components/schemas/Section'
+        title:
+          type: string
+        year:
+          type: string
     WorkRef:
       type: object
       required:
-        - id
         - code
+        - id
         - title
       properties:
-        id:
-          $ref: '#/components/schemas/ID'
         code:
           type: string
+        id:
+          $ref: '#/components/schemas/ID'
         title:
           type: string
