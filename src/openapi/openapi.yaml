@@ -47,9 +47,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Work"
+                $ref: "#/components/schemas/Work"
         "204":
           description: The server successfully processed the request, and is not returning any content.
         "500":
@@ -233,7 +231,7 @@ components:
         - text
       properties:
         id:
-          $ref: '#/components/schemas/ID'
+          $ref: "#/components/schemas/ID"
         ref:
           type: string
         text:
@@ -249,9 +247,9 @@ components:
         fnRefs:
           type: array
           items:
-            $ref: '#/components/schemas/ID'
+            $ref: "#/components/schemas/ID"
         id:
-          $ref: '#/components/schemas/ID'
+          $ref: "#/components/schemas/ID"
         text:
           type: string
         tocText:
@@ -269,7 +267,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NaturalNumber"
-        snippet:
+        snippets:
           type: array
           items:
             type: string
@@ -295,15 +293,16 @@ components:
     Paragraph:
       type: object
       required:
+        - fnRefs
         - id
         - text
       properties:
         fnRefs:
           type: array
           items:
-            $ref: '#/components/schemas/ID'
+            $ref: "#/components/schemas/ID"
         id:
-          $ref: '#/components/schemas/ID'
+          $ref: "#/components/schemas/ID"
         text:
           type: string
         summaryRef:
@@ -362,15 +361,15 @@ components:
         - heading
       properties:
         heading:
-          $ref: '#/components/schemas/ID'
+          $ref: "#/components/schemas/ID"
         paragraphs:
           type: array
           items:
-            $ref: '#/components/schemas/ID'
+            $ref: "#/components/schemas/ID"
         sections:
           type: array
           items:
-            $ref: '#/components/schemas/Section'
+            $ref: "#/components/schemas/Section"
     Summary:
       type: object
       required:
@@ -383,7 +382,7 @@ components:
           items:
             type: string
         id:
-          $ref: '#/components/schemas/ID'
+          $ref: "#/components/schemas/ID"
         ref:
           type: string
         text:
@@ -397,15 +396,15 @@ components:
         - works
       properties:
         section:
-          $ref: '#/components/schemas/VolumeSection'
+          $ref: "#/components/schemas/VolumeSection"
         title:
           type: string
         volumeNumber:
-          $ref: '#/components/schemas/VolumeNumber'
+          $ref: "#/components/schemas/VolumeNumber"
         works:
           type: array
           items:
-            $ref: '#/components/schemas/WorkRef'
+            $ref: "#/components/schemas/WorkRef"
     VolumeNumber:
       type: integer
       minimum: 1
@@ -425,13 +424,17 @@ components:
         abbreviation:
           type: string
         id:
-          $ref: '#/components/schemas/ID'
+          $ref: "#/components/schemas/ID"
         code:
           type: string
+        paragraphs:
+          type: array
+          items:
+            $ref: "#/components/schemas/ID"
         sections:
           type: array
           items:
-            $ref: '#/components/schemas/Section'
+            $ref: "#/components/schemas/Section"
         title:
           type: string
         year:
@@ -446,6 +449,6 @@ components:
         code:
           type: string
         id:
-          $ref: '#/components/schemas/ID'
+          $ref: "#/components/schemas/ID"
         title:
           type: string
