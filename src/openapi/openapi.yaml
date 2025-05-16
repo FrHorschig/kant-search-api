@@ -300,7 +300,7 @@ components:
         fnRefs:
           type: array
           items:
-            $ref: "#/components/schemas/ID"
+            type: string
         id:
           $ref: "#/components/schemas/ID"
         text:
