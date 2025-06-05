@@ -28,7 +28,7 @@ paths:
                   $ref: "#/components/schemas/Volume"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /works/{workId}:
+  /works/{workCode}:
     get:
       tags:
         - Read
@@ -36,11 +36,11 @@ paths:
       summary: Get the data of a work
       parameters:
         - in: path
-          name: workId
+          name: workCode
           required: true
           schema:
-            $ref: "#/components/schemas/ID"
-          description: ID of the work
+            $ref: "#/components/schemas/WorkCode"
+          description: WorkCode of the work
       responses:
         "200":
           description: Returns the metadata and the structural data of the work
@@ -52,7 +52,7 @@ paths:
           description: The server successfully processed the request, and is not returning any content.
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /works/{workId}/footnotes:
+  /works/{workCode}/footnotes:
     get:
       tags:
         - Read
@@ -60,11 +60,11 @@ paths:
       summary: Get the data of all footnotes of a work
       parameters:
         - in: path
-          name: workId
+          name: workCode
           required: true
           schema:
-            $ref: "#/components/schemas/ID"
-          description: ID of the work
+            $ref: "#/components/schemas/WorkCode"
+          description: WorkCode of the work
       responses:
         "200":
           description: OK
@@ -78,7 +78,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /works/{workId}/headings:
+  /works/{workCode}/headings:
     get:
       tags:
         - Read
@@ -86,11 +86,11 @@ paths:
       summary: Get the data of all headings of a work
       parameters:
         - in: path
-          name: workId
+          name: workCode
           required: true
           schema:
-            $ref: "#/components/schemas/ID"
-          description: ID of the work
+            $ref: "#/components/schemas/WorkCode"
+          description: WorkCode of the work
       responses:
         "200":
           description: OK
@@ -104,7 +104,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /works/{workId}/paragraphs:
+  /works/{workCode}/paragraphs:
     get:
       tags:
         - Read
@@ -112,11 +112,11 @@ paths:
       summary: Get the data of all paragraphs of a work
       parameters:
         - in: path
-          name: workId
+          name: workCode
           required: true
           schema:
-            $ref: "#/components/schemas/ID"
-          description: ID of the work
+            $ref: "#/components/schemas/WorkCode"
+          description: WorkCode of the work
       responses:
         "200":
           description: OK
@@ -130,7 +130,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /works/{workId}/summaries:
+  /works/{workCode}/summaries:
     get:
       tags:
         - Read
@@ -138,11 +138,11 @@ paths:
       summary: Get the data of all summaries of a work
       parameters:
         - in: path
-          name: workId
+          name: workCode
           required: true
           schema:
-            $ref: "#/components/schemas/ID"
-          description: ID of the work
+            $ref: "#/components/schemas/WorkCode"
+          description: WorkCode of the work
       responses:
         "200":
           description: OK
@@ -171,7 +171,7 @@ paths:
               $ref: "#/components/schemas/SearchCriteria"
       responses:
         "200":
-          description: Returns the search results, the array is empty if no result is found. The list or results is given in the same order as the input workIDs.
+          description: Returns the search results, the array is empty if no result is found. The list or results is given in the same order as the input workCodes.
           content:
             application/json:
               schema:
@@ -226,12 +226,12 @@ components:
     Footnote:
       type: object
       required:
-        - id
+        - ordinal
         - ref
         - text
       properties:
-        id:
-          $ref: "#/components/schemas/ID"
+        ordinal:
+          $ref: "#/components/schemas/NaturalNumber"
         ref:
           type: string
         text:
@@ -240,16 +240,16 @@ components:
       type: object
       required:
         - fnRefs
-        - id
+        - ordinal
         - text
         - tocText
       properties:
         fnRefs:
           type: array
           items:
-            $ref: "#/components/schemas/ID"
-        id:
-          $ref: "#/components/schemas/ID"
+            $ref: "#/components/schemas/WorkCode"
+        ordinal:
+          $ref: "#/components/schemas/NaturalNumber"
         text:
           type: string
         tocText:
@@ -257,12 +257,12 @@ components:
     Hit:
       type: object
       required:
-        - contentId
+        - ordinal
         - pages
         - snippets
       properties:
-        contentId:
-          $ref: "#/components/schemas/ID"
+        ordinal:
+          $ref: "#/components/schemas/NaturalNumber"
         pages:
           type: array
           items:
@@ -285,8 +285,6 @@ components:
           type: array
           items:
             type: string
-    ID:
-      type: string
     NaturalNumber:
       type: integer
       minimum: 1
@@ -294,15 +292,15 @@ components:
       type: object
       required:
         - fnRefs
-        - id
+        - ordinal
         - text
       properties:
         fnRefs:
           type: array
           items:
             type: string
-        id:
-          $ref: "#/components/schemas/ID"
+        ordinal:
+          $ref: "#/components/schemas/NaturalNumber"
         text:
           type: string
         summaryRef:
@@ -325,7 +323,7 @@ components:
         - includeFootnotes
         - includeSummaries
         - scope
-        - workIds
+        - workCodes
       properties:
         includeHeadings:
           type: boolean
@@ -335,22 +333,22 @@ components:
           type: boolean
         scope:
           $ref: "#/components/schemas/SearchScope"
-        workIds:
+        workCodes:
           type: array
           items:
-            $ref: "#/components/schemas/ID"
+            $ref: "#/components/schemas/WorkCode"
     SearchResult:
       type: object
       required:
         - hits
-        - workId
+        - workCode
       properties:
         hits:
           type: array
           items:
             $ref: "#/components/schemas/Hit"
-        workId:
-          $ref: "#/components/schemas/ID"
+        workCode:
+          $ref: "#/components/schemas/WorkCode"
     SearchScope:
       type: string
       enum:
@@ -361,11 +359,11 @@ components:
         - heading
       properties:
         heading:
-          $ref: "#/components/schemas/ID"
+          $ref: "#/components/schemas/NaturalNumber"
         paragraphs:
           type: array
           items:
-            $ref: "#/components/schemas/ID"
+            $ref: "#/components/schemas/NaturalNumber"
         sections:
           type: array
           items:
@@ -373,7 +371,7 @@ components:
     Summary:
       type: object
       required:
-        - id
+        - ordinal
         - ref
         - text
       properties:
@@ -381,8 +379,8 @@ components:
           type: array
           items:
             type: string
-        id:
-          $ref: "#/components/schemas/ID"
+        ordinal:
+          $ref: "#/components/schemas/NaturalNumber"
         ref:
           type: string
         text:
@@ -417,20 +415,17 @@ components:
       type: object
       required:
         - code
-        - id
         - sections
         - title
       properties:
         abbreviation:
           type: string
-        id:
-          $ref: "#/components/schemas/ID"
         code:
-          type: string
+          $ref: "#/components/schemas/WorkCode"
         paragraphs:
           type: array
           items:
-            $ref: "#/components/schemas/ID"
+            $ref: "#/components/schemas/NaturalNumber"
         sections:
           type: array
           items:
@@ -439,16 +434,15 @@ components:
           type: string
         year:
           type: string
+    WorkCode:
+      type: string
     WorkRef:
       type: object
       required:
         - code
-        - id
         - title
       properties:
         code:
-          type: string
-        id:
-          $ref: "#/components/schemas/ID"
+          $ref: "#/components/schemas/WorkCode"
         title:
           type: string
