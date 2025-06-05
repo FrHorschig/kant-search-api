@@ -442,6 +442,8 @@ components:
         - code
         - title
       properties:
+        abbreviation:
+          type: string
         code:
           $ref: "#/components/schemas/WorkCode"
         title:
