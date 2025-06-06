@@ -28,30 +28,6 @@ paths:
                   $ref: "#/components/schemas/Volume"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /works/{workCode}:
-    get:
-      tags:
-        - Read
-      operationId: getWork
-      summary: Get the data of a work
-      parameters:
-        - in: path
-          name: workCode
-          required: true
-          schema:
-            $ref: "#/components/schemas/WorkCode"
-          description: WorkCode of the work
-      responses:
-        "200":
-          description: Returns the metadata and the structural data of the work
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Work"
-        "204":
-          description: The server successfully processed the request, and is not returning any content.
-        "500":
-          $ref: "#/components/responses/InternalServerError"
   /works/{workCode}/footnotes:
     get:
       tags:
@@ -309,13 +285,13 @@ components:
       type: object
       required:
         - options
-        - searchString
+        - searchTerms
       properties:
         options:
           $ref: "#/components/schemas/SearchOptions"
-        searchString:
+        searchTerms:
           type: string
-          maxLength: 1000
+          maxLength: 10000
     SearchOptions:
       type: object
       required:
@@ -402,7 +378,7 @@ components:
         works:
           type: array
           items:
-            $ref: "#/components/schemas/WorkRef"
+            $ref: "#/components/schemas/Work"
     VolumeNumber:
       type: integer
       minimum: 1
@@ -416,6 +392,7 @@ components:
       required:
         - code
         - sections
+        - ordinal
         - title
       properties:
         abbreviation:
@@ -430,21 +407,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Section"
+        ordinal:
+          $ref: "#/components/schemas/NaturalNumber"
         title:
           type: string
         year:
           type: string
     WorkCode:
       type: string
-    WorkRef:
-      type: object
-      required:
-        - code
-        - title
-      properties:
-        abbreviation:
-          type: string
-        code:
-          $ref: "#/components/schemas/WorkCode"
-        title:
-          type: string
