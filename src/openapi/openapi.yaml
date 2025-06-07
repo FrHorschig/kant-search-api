@@ -40,7 +40,16 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/WorkCode"
-          description: WorkCode of the work
+          description: code of the work
+        - in: query
+          name: ordinals
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+          explode: false
+          description: The ordinals of the wanted footnotes, skip if all are needed
       responses:
         "200":
           description: OK
@@ -66,7 +75,16 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/WorkCode"
-          description: WorkCode of the work
+          description: code of the work
+        - in: query
+          name: ordinals
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+          explode: false
+          description: The ordinals of the wanted headings, skip if all are needed
       responses:
         "200":
           description: OK
@@ -92,7 +110,16 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/WorkCode"
-          description: WorkCode of the work
+          description: code of the work
+        - in: query
+          name: ordinals
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+          explode: false
+          description: The ordinals of the wanted paragraphs, skip if all are needed
       responses:
         "200":
           description: OK
@@ -118,7 +145,16 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/WorkCode"
-          description: WorkCode of the work
+          description: code of the work
+        - in: query
+          name: ordinals
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+          explode: false
+          description: The ordinals of the wanted summaries, skip if all are needed
       responses:
         "200":
           description: OK
