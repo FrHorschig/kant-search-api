@@ -279,6 +279,7 @@ components:
         - pages
         - rawText
         - snippets
+        - wordIndexMap
       properties:
         fmtText:
           type: string
@@ -294,6 +295,10 @@ components:
           type: array
           items:
             type: string
+        wordIndexMap:
+          type: object
+          additionalProperties:
+            type: integer
     HttpError:
       type: object
       required:
