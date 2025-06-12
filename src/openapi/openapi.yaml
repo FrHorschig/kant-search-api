@@ -274,22 +274,26 @@ components:
     Hit:
       type: object
       required:
+        - fmtText
         - ordinal
         - pages
+        - rawText
         - snippets
       properties:
+        fmtText:
+          type: string
         ordinal:
           $ref: "#/components/schemas/NaturalNumber"
         pages:
           type: array
           items:
             $ref: "#/components/schemas/NaturalNumber"
+        rawText:
+          type: string
         snippets:
           type: array
           items:
             type: string
-        text:
-          type: string
     HttpError:
       type: object
       required:
