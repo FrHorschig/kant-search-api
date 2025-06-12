@@ -275,13 +275,14 @@ components:
       type: object
       required:
         - fmtText
+        - highlightText
         - ordinal
         - pages
-        - rawText
-        - snippets
         - wordIndexMap
       properties:
         fmtText:
+          type: string
+        highlightText:
           type: string
         ordinal:
           $ref: "#/components/schemas/NaturalNumber"
@@ -289,12 +290,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NaturalNumber"
-        rawText:
-          type: string
-        snippets:
-          type: array
-          items:
-            type: string
         wordIndexMap:
           type: object
           additionalProperties:
