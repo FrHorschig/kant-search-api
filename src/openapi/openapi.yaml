@@ -382,7 +382,6 @@ components:
         - includeHeadings
         - includeFootnotes
         - includeSummaries
-        - scope
         - withStemming
         - workCodes
       properties:
@@ -392,8 +391,6 @@ components:
           type: boolean
         includeSummaries:
           type: boolean
-        scope:
-          $ref: "#/components/schemas/SearchScope"
         withStemming:
           type: boolean
         workCodes:
@@ -412,10 +409,6 @@ components:
             $ref: "#/components/schemas/Hit"
         workCode:
           $ref: "#/components/schemas/WorkCode"
-    SearchScope:
-      type: string
-      enum:
-        - PARAGRAPH
     Section:
       type: object
       required:
