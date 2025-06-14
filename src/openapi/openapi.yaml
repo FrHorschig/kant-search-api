@@ -7,9 +7,11 @@ servers:
   - url: https://localhost:3000/api/v1
 tags:
   - name: Read
-    description: operations to text data
+    description: operations for fetching data
   - name: Search
     description: operations for searching
+  - name: Util
+    description: utility operations
 paths:
   /volumes:
     get:
@@ -194,6 +196,26 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
+  /upload:
+    post:
+      tags:
+        - Search
+      operationId: upload
+      summary: Upload an XML file
+      requestBody:
+        required: true
+        content:
+          application/xml:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "201":
+          description: File uploaded successfully
+        "400":
+          description: Invalid XML format
+        "500":
+          description: Server error
 components:
   responses:
     BadRequest:
@@ -232,9 +254,6 @@ components:
         - BAD_REQUEST.SYNTAX.MISSING_CLOSING_PARENTHESIS
         - BAD_REQUEST.SYNTAX.WRONG_ENDING_CHAR
         - BAD_REQUEST.SYNTAX.UNTERMINATED_DOUBLE_QUOTE
-        - NOT_FOUND.GENERIC
-        - NOT_FOUND.VOLUMES
-        - NOT_FOUND.WORK
     Footnote:
       type: object
       required:
@@ -457,7 +476,7 @@ components:
         - title
         - year
       properties:
-        abbreviation:
+        siglum:
           type: string
         code:
           $ref: "#/components/schemas/WorkCode"
