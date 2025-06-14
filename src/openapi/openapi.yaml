@@ -276,7 +276,9 @@ components:
       required:
         - fmtText
         - highlightText
+        - lineByIndex
         - ordinal
+        - pageByIndex
         - pages
         - wordIndexMap
       properties:
@@ -284,8 +286,16 @@ components:
           type: string
         highlightText:
           type: string
+        lineByIndex:
+          type: array
+          items:
+            $ref: "#/components/schemas/IndexNumberPair"
         ordinal:
           $ref: "#/components/schemas/NaturalNumber"
+        pageByIndex:
+          type: array
+          items:
+            $ref: "#/components/schemas/IndexNumberPair"
         pages:
           type: array
           items:
@@ -308,6 +318,14 @@ components:
           type: array
           items:
             type: string
+    IndexNumberPair:
+      type: object
+      required: [i, num]
+      properties:
+        i:
+          $ref: "#/components/schemas/NaturalNumber"
+        num:
+          $ref: "#/components/schemas/NaturalNumber"
     NaturalNumber:
       type: integer
       minimum: 1
@@ -414,13 +432,10 @@ components:
     Volume:
       type: object
       required:
-        - section
         - title
         - volumeNumber
         - works
       properties:
-        section:
-          $ref: "#/components/schemas/VolumeSection"
         title:
           type: string
         volumeNumber:
@@ -433,10 +448,6 @@ components:
       type: integer
       minimum: 1
       maximum: 23
-    VolumeSection:
-      type: integer
-      minimum: 1
-      maximum: 3
     Work:
       type: object
       required:
@@ -444,6 +455,7 @@ components:
         - sections
         - ordinal
         - title
+        - year
       properties:
         abbreviation:
           type: string
