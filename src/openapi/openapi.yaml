@@ -382,7 +382,7 @@ components:
       required:
         - includeHeadings
         - includeFootnotes
-        - includeSummaries
+        - includeParagraphs
         - withStemming
         - workCodes
       properties:
@@ -390,7 +390,7 @@ components:
           type: boolean
         includeFootnotes:
           type: boolean
-        includeSummaries:
+        includeParagraphs:
           type: boolean
         withStemming:
           type: boolean
