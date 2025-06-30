@@ -199,7 +199,7 @@ paths:
   /upload:
     post:
       tags:
-        - Search
+        - Util
       operationId: upload
       summary: Upload an XML file
       requestBody:
