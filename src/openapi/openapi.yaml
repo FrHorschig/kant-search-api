@@ -216,20 +216,6 @@ paths:
           description: Invalid XML format
         "500":
           description: Server error
-  /health:
-    get:
-      tags:
-        - Util
-      operationId: health
-      summary: Health check
-      responses:
-        "200":
-          description: Server is healthy
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: UP
 components:
   responses:
     BadRequest:
